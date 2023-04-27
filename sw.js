@@ -1,83 +1,222 @@
 /* ===========================================================
- * docsify sw.js
- * ===========================================================
- * Copyright 2016 @huxpro
- * Licensed under Apache 2.0
- * Register service worker.
+ * docs.wern.cc service worker
+ *   Copyright 2023 @wxwern
+ *
+ * Modified from official docsify documentation.
+ *   Copyright 2016 @huxpro
+ *   Licensed under Apache 2.0
  * ========================================================== */
 
-const RUNTIME = 'docsify'
+const RUNTIME = 'docs-werncc-runtime-v0';
 const HOSTNAME_WHITELIST = [
   self.location.hostname,
   'fonts.gstatic.com',
   'fonts.googleapis.com',
   'cdn.jsdelivr.net'
-]
+];
+const CRITICAL_SELF_HOST_PATHS = [
+  '/',
+  '/_404.md',
+  '/_sidebar.md',
+  '/README.md',
+];
+const CRITICAL_EXTERNAL_URLS = [
+  "https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js",
+  "https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js",
+  "https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js",
+  "https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/zoom-image.min.js",
+  "https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css",
+  "https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css",
+];
 
-// The Util Function to hack URLs of intercepted requests
-const getFixedUrl = (req) => {
-  var now = Date.now()
-  var url = new URL(req.url)
 
-  // 1. fixed http URL
-  // Just keep syncing with location.protocol
-  // fetch(httpURL) belongs to active mixed content.
-  // And fetch(httpRequest) is not supported yet.
-  url.protocol = self.location.protocol
+// ===== URL GETTERS =====
 
-  // 2. add query for caching-busting.
-  // Github Pages served with Cache-Control: max-age=600
-  // max-age on mutable content is error-prone, with SW life of bugs can even extend.
-  // Until cache mode of Fetch API landed, we have to workaround cache-busting with query string.
-  // Cache-Control-Bug: https://bugs.chromium.org/p/chromium/issues/detail?id=453190
+// Cache busted URL for fetching 1st party content,
+// original URL for fetching 3rd-party content.
+const getRemoteFetchUrl = (req) => {
+  var now = Date.now();
+  var url = new URL(req.url);
+
+  // Fixed http URL
+  url.protocol = self.location.protocol;
+
+  // Add query for caching-busting.
+  // See Cache-Control bug: https://bugs.chromium.org/p/chromium/issues/detail?id=453190
   if (url.hostname === self.location.hostname) {
-    url.search += (url.search ? '&' : '?') + 'cache-bust=' + now
+    url.search += (url.search ? '&' : '?') + 'cache-bust=' + now;
   }
-  return url.href
+  return url.href;
 }
 
-/**
- *  @Lifecycle Activate
- *  New one activated when old isnt being used.
- *
- *  waitUntil(): activating ====> activated
- */
+// URL without query string
+const getNoParamUrl = (req) => {
+  var url = new URL(req.url);
+  url.search = '';
+  return url.href;
+}
+
+// Alternative URL for the request that can return the same result.
+// This is used for offline caching to work under 'history' routing mode.
+const getAltUrl = (req) => {
+  var url = new URL(req.url);
+
+  if (url.hostname == self.location.hostname &&
+      !url.pathname.split('/').pop().includes('.') &&
+      url.pathname != '/') {
+
+    // Get the root if this is not a request for a file,
+    // as all paths use the same index.html file under history routing mode.
+    url.pathname = '/';
+    url.search = '';
+
+    return url.href;
+  } else {
+    // Otherwise we say there's no alternative URL.
+    return undefined;
+  }
+}
+
+
+
+// ===== RESPONSE AND CACHE MANAGERS =====
+
+// Given a response, inserts new header to track cache time,
+// so as to detect stale content later.
+const insertCacheHeaderTime = (res) => {
+  let headers = new Headers(res.headers);
+  headers.append('sw-fetched-on', new Date().getTime());
+  return res.blob().then(body =>
+    new Response(body, {
+      status: res.status,
+      statusText: res.statusText,
+      headers: headers
+    })
+  ).catch(_ => res);
+}
+
+// Serve cache content if available within the max age.
+// If the cached response is stale, we wait for the live response unless that fails.
+// This is to avoid showing stale content when the user is online,
+// while still allowing offline access to the content.
+const getCombinedResponsePromise = (liveResponse, cachedResponse) => {
+  const maxAge = 1 * 60 * 60 * 1000; // 1 hour
+
+  return cachedResponse.then((cRes) => {
+    let swFetchedOn = cRes.headers.get('sw-fetched-on');
+    let isUsable = (swFetchedOn && (parseFloat(swFetchedOn) + maxAge) > new Date().getTime());
+
+    if (isUsable) {
+      return cachedResponse;
+    } else {
+      return liveResponse.catch(() => cachedResponse);
+    }
+  }).catch(_ => {
+    return liveResponse;
+  });
+
+}
+
+// Cleanup for old stuff
+const deleteOldCaches = async () => {
+  const keyList = await caches.keys();
+  const cachesToDelete = keyList.filter(key => key != RUNTIME);
+  await Promise.all(cachesToDelete.map(deleteCache));
+};
+
+
+
+
+
+// ===== EVENT LISTENERS =====
+
 self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim())
-})
+  event.waitUntil(Promise.allSettled([
+    self.clients.claim(),
+    deleteOldCaches()
+  ]));
 
-/**
- *  @Functional Fetch
- *  All network requests are being intercepted here.
- *
- *  void respondWith(Promise<Response> r)
- */
+});
+
+self.addEventListener("install", event => {
+  self.skipWaiting();
+
+  event.waitUntil(async () => {
+    // Pre-cache critical files
+    const urls = CRITICAL_SELF_HOST_PATHS.concat(CRITICAL_EXTERNAL_URLS);
+
+    return caches.open(RUNTIME).then(cache =>
+      Promise.allSettled(urls.map(async url => {
+        const fetchedResponse = await fetch(url, { cache: 'no-store' }).then(r => insertCacheHeaderTime(r));
+
+        const final = cache.put(url, fetchedResponse);
+        final.then(() => console.log('Cached critical path: ' + url));
+
+        return final;
+      }))
+    );
+  });
+});
+
 self.addEventListener('fetch', event => {
-  // Skip some of cross-origin requests, like those for Google Analytics.
-  if (HOSTNAME_WHITELIST.indexOf(new URL(event.request.url).hostname) > -1) {
-    // Stale-while-revalidate
-    // similar to HTTP's stale-while-revalidate: https://www.mnot.net/blog/2007/12/12/stale
-    // Upgrade from Jake's to Surma's: https://gist.github.com/surma/eb441223daaedf880801ad80006389f1
-    const cached = caches.match(event.request)
-    const fixedUrl = getFixedUrl(event.request)
-    const fetched = fetch(fixedUrl, { cache: 'no-store' })
-    const fetchedCopy = fetched.then(resp => resp.clone())
 
-    // Call respondWith() with whatever we get first.
-    // If the fetch fails (e.g disconnected), wait for the cache.
-    // If there’s nothing in cache, wait for the fetch.
-    // If neither yields a response, return offline pages.
+  if (HOSTNAME_WHITELIST.indexOf(new URL(event.request.url).hostname) > -1 && event.request.method === 'GET') {
+    // Only allow necessary hosts and requests to be cached.
+    const mainRequest = event.request;
+
+    const noParamUrl = getNoParamUrl(mainRequest);
+    const fixedUrl = getRemoteFetchUrl(mainRequest);
+    const altUrl = getAltUrl(mainRequest);
+
+    console.log("SW: Loading " + noParamUrl);
+
+    // Get both cache and live copies
+    const cached = caches.match(noParamUrl);
+    const fetched = fetch(fixedUrl, { cache: 'no-store' });
+    const fetchedCopy = fetched.then(resp => resp.clone());
+
+    // Get the optimal response to return to the user
     event.respondWith(
-      Promise.race([fetched.catch(_ => cached), cached])
-        .then(resp => resp || fetched)
-        .catch(_ => { /* eat any errors */ })
-    )
+      getCombinedResponsePromise(fetched, cached)
+      .then(resp => {
+        return resp;
+      })
+      .catch(err => {
+        return altUrl ? caches.match(altUrl) : Promise.reject(err);
+      })
+      .catch(_ => {
+        return new Response(
+          "<h1>408 Request Timeout</h1>" +
+          "<h2>You might not be connected to the Internet</h2><p>Please check your network and try again.</p><hr />" +
+          "<p>All files and pages on this documentation site, if they exist, will be automatically cached " +
+          "for offline access (as long as you've loaded them with an Internet connection before).</p>",
+          { status: 408, headers: { 'Content-Type': 'text/html' } }
+        );
+      })
+    );
 
-    // Update the cache with the version we fetched (only for ok status)
+    // Update the cache with the version we just fetched (only if status=ok)
     event.waitUntil(
       Promise.all([fetchedCopy, caches.open(RUNTIME)])
-        .then(([response, cache]) => response.ok && cache.put(event.request, response))
-        .catch(_ => { /* eat any errors */ })
+      .then(async ([response, cache]) => {
+        if (response.ok) {
+          let resp = await insertCacheHeaderTime(response);
+          await cache.put(noParamUrl, resp);
+          if (altUrl) {
+            await cache.put(altUrl, resp);
+          }
+        }
+      })
+      .catch(async _ => { /* eat any errors */ })
     )
+
+  } else {
+    // Don't cache other requests.
+    return;
   }
-})
+
+});
+
+
+
+
