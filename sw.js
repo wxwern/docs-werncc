@@ -12,6 +12,7 @@ const HOSTNAME_WHITELIST = [
   self.location.hostname,
   'fonts.gstatic.com',
   'fonts.googleapis.com',
+  'raw.githubusercontent.com',
   'cdn.jsdelivr.net'
 ];
 const CRITICAL_SELF_HOST_PATHS = [
@@ -100,6 +101,13 @@ const insertCacheHeaderTime = (res) => {
 // This is to avoid showing stale content when the user is online,
 // while still allowing offline access to the content.
 const getCombinedResponsePromise = (liveResponse, cachedResponse) => {
+
+  if (self.location.hostname == 'localhost') {
+    // Always prioritise live responses when debugging.
+    return liveResponse.catch(_ => cachedResponse);
+  }
+
+
   const maxAge = 1 * 60 * 60 * 1000; // 1 hour
 
   return cachedResponse.then((cRes) => {
@@ -160,60 +168,72 @@ self.addEventListener("install", event => {
 
 self.addEventListener('fetch', event => {
 
-  if (HOSTNAME_WHITELIST.indexOf(new URL(event.request.url).hostname) > -1 && event.request.method === 'GET') {
-    // Only allow necessary hosts and requests to be cached.
-    const mainRequest = event.request;
-
-    const noParamUrl = getNoParamUrl(mainRequest);
-    const fixedUrl = getRemoteFetchUrl(mainRequest);
-    const altUrl = getAltUrl(mainRequest);
-
-    console.log("SW: Loading " + noParamUrl);
-
-    // Get both cache and live copies
-    const cached = caches.match(noParamUrl);
-    const fetched = fetch(fixedUrl, { cache: 'no-store' });
-    const fetchedCopy = fetched.then(resp => resp.clone());
-
-    // Get the optimal response to return to the user
-    event.respondWith(
-      getCombinedResponsePromise(fetched, cached)
-      .then(resp => {
-        return resp;
-      })
-      .catch(err => {
-        return altUrl ? caches.match(altUrl) : Promise.reject(err);
-      })
-      .catch(_ => {
-        return new Response(
-          "<h1>408 Request Timeout</h1>" +
-          "<h2>You might not be connected to the Internet</h2><p>Please check your network and try again.</p><hr />" +
-          "<p>All files and pages on this documentation site, if they exist, will be automatically cached " +
-          "for offline access (as long as you've loaded them with an Internet connection before).</p>",
-          { status: 408, headers: { 'Content-Type': 'text/html' } }
-        );
-      })
-    );
-
-    // Update the cache with the version we just fetched (only if status=ok)
-    event.waitUntil(
-      Promise.all([fetchedCopy, caches.open(RUNTIME)])
-      .then(async ([response, cache]) => {
-        if (response.ok) {
-          let resp = await insertCacheHeaderTime(response);
-          await cache.put(noParamUrl, resp);
-          if (altUrl) {
-            await cache.put(altUrl, resp);
-          }
-        }
-      })
-      .catch(async _ => { /* eat any errors */ })
-    )
-
-  } else {
-    // Don't cache other requests.
+  const targetUrl = new URL(event.request.url);
+  if (
+    // Skip cross-port requests (like docsify live-reload)
+    (self.location.hostname == targetUrl.hostname && self.location.port != targetUrl.port) ||
+    // Skip requests to other hosts
+    HOSTNAME_WHITELIST.indexOf(targetUrl.hostname) == -1 ||
+    // Skip non-GET requests
+    event.request.method !== 'GET'
+  ) {
+    console.log("SW: Passthrough " + event.request.url);
+    event.respondWith(fetch(event.request));
     return;
   }
+
+  // Only allow necessary hosts and requests to be cached below.
+
+  // Begin preparations
+  const mainRequest = event.request;
+
+  const noParamUrl = getNoParamUrl(mainRequest);
+  const fixedUrl = getRemoteFetchUrl(mainRequest);
+  const altUrl = getAltUrl(mainRequest);
+
+  console.log("SW: Loading " + noParamUrl);
+
+  // Get both cache and live copies
+  const cached = caches.match(noParamUrl);
+  const fetched = fetch(fixedUrl, { cache: 'no-store' });
+  const fetchedCopy = fetched.then(resp => resp.clone());
+
+  // Get the optimal response to return to the user
+  event.respondWith(
+    getCombinedResponsePromise(fetched, cached)
+    .then(resp => {
+      return resp;
+    })
+    .catch(err => {
+      return altUrl ? caches.match(altUrl) : Promise.reject(err);
+    })
+    .catch(_ => {
+      return new Response(
+        "<h1>408 Request Timeout</h1>" +
+        "<h2>You might not be connected to the Internet</h2><p>Please check your network and try again.</p><hr />" +
+        "<p>All files and pages on this documentation site, if they exist, will be automatically cached " +
+        "for offline access (as long as you've loaded them with an Internet connection before).</p>",
+        { status: 408, headers: { 'Content-Type': 'text/html' } }
+      );
+    })
+  );
+
+  // Update the cache with the version we just fetched (only if status=ok)
+  event.waitUntil(
+    Promise.all([fetchedCopy, caches.open(RUNTIME)])
+    .then(async ([response, cache]) => {
+      if (response.ok) {
+        let resp = await insertCacheHeaderTime(response);
+        await cache.put(noParamUrl, resp);
+        if (altUrl) {
+          await cache.put(altUrl, resp);
+        }
+      } else {
+        await cache.delete(noParamUrl);
+      }
+    })
+    .catch(async _ => { /* eat any errors */ })
+  );
 
 });
 
