@@ -19,6 +19,8 @@
         --theme-lightness: 40%;
 
         --base-font-weight: 500;
+
+        --content-max-width: 100em;
       }
       @media (prefers-color-scheme: dark) {
         :root {
@@ -41,6 +43,22 @@
         subMaxLevel: 2,
         notFoundPage: true,
         routerMode: 'history',
+        alias: {
+          '/personal-diary/faq':
+            'https://raw.githubusercontent.com/wxwern/personal-diary/master/FAQ',
+          '/personal-diary/changelog':
+            'https://raw.githubusercontent.com/wxwern/personal-diary/master/CHANGELOG',
+          '/personal-diary/export-data-format':
+            'https://raw.githubusercontent.com/wxwern/personal-diary/master/data_format/DOCS',
+        },
+        search: {
+          maxAge: 1 * 60 * 60 * 1000, // expiration time in ms
+          paths: 'auto',
+          placeholder: 'Type to search',
+          noData: 'No Results!',
+          depth: 6,
+          hideOtherSidebarContent: false, // whether or not to hide other sidebar content
+        },
       };
     </script>
 
