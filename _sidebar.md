@@ -1,8 +1,8 @@
 [**docs.wern.cc**](/ "docs.wern.cc")
 
 Applications
- * [Personal Diary](personal-diary/)
- * [Calculator Plus](calculator-plus/)
+ * [![](personal-diary/_media/icon.png ':size=20')Personal Diary](personal-diary/)
+ * [![](calculator-plus/_media/icon.png ':size=20')Calculator Plus](calculator-plus/)
 
 Open Source Software
  * [Clarity](clarity/)

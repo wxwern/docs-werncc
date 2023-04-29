@@ -20,7 +20,7 @@ Note that on wider screens, you may have the Timeline on the left, next to a cov
 
 ![Timeline Widescreen Screenshot](_media/timeline-wide.png ':size=800')
 
-Now, **Creating an entry** is easy. Simply press the `+` button at the top right and a new page should pop up.
+Now, **creating an entry** is easy. Simply press the `+` button at the top right and a new page should pop up.
 
 ## Entry Page
 

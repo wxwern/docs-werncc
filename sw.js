@@ -191,17 +191,20 @@ self.addEventListener('fetch', event => {
   const fixedUrl = getRemoteFetchUrl(mainRequest);
   const altUrl = getAltUrl(mainRequest);
 
+  const headers = new Headers(mainRequest.headers);
+
   console.log("SW: Loading " + noParamUrl);
 
   // Get both cache and live copies
   const cached = caches.match(noParamUrl);
-  const fetched = fetch(fixedUrl, { cache: 'no-store' });
+  const fetched = fetch(fixedUrl, { headers: headers, cache: 'no-store' });
   const fetchedCopy = fetched.then(resp => resp.clone());
 
   // Get the optimal response to return to the user
   event.respondWith(
     getCombinedResponsePromise(fetched, cached)
     .then(resp => {
+      console.log(resp);
       return resp;
     })
     .catch(err => {

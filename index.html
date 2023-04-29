@@ -19,8 +19,6 @@
         --theme-saturation: 70%;
         --theme-lightness: 40%;
 
-        --base-font-weight: 500;
-
         --content-max-width: 100em;
         --content-max-width: min(max(90vw, 55em), 110em);
         --sidebar-toggle-width: 40px;
@@ -57,6 +55,7 @@
       window.$docsify = {
         loadSidebar: true,
         subMaxLevel: 2,
+        auto2top: true,
         notFoundPage: true,
         routerMode: 'history',
         alias: {

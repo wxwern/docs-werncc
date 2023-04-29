@@ -8,6 +8,6 @@ Welcome! Find **tutorials**, **documentations** and **advanced information** on 
 
 ---
 
-© Wern Jie Lim ([wern.cc](https://wern.cc))
+© [wern.cc](https://wern.cc)
 
-<span style="font-size: 70%">Documentation pages powered by [docsify](https://github.com/docsifyjs/docsify) with [docsify-themeable](https://github.com/jhildenbiddle/docsify-themeable) (MIT License).</span>
+<span style="font-size: 70%">_Powered by [docsify](https://github.com/docsifyjs/docsify) + [docsify-themeable](https://github.com/jhildenbiddle/docsify-themeable)_</span>

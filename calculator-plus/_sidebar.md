@@ -1,14 +1,14 @@
-[Calculator Plus](/calculator-plus/ "Calculator Plus Tutorial & Documentation")
+[![](_media/icon.png ':size=20')Calculator Plus](/calculator-plus/ "Calculator Plus Tutorial & Documentation")
 
-Getting Started
+**Getting Started**
  * [Calculator Interface](calculator-plus/interface.md "Calculator Plus - Interacting with the Interface")
  * [Customization](calculator-plus/customize-settings.md "Calculator Plus - Basic Customization")
  * [Frequently Asked Questions](calculator-plus/faq.md "Calculator Plus - Frequently Asked Questions")
 
-Features
+**Features**
 
 
-Advanced
+**Advanced**
  * [Operations & Details](calculator-plus/operations.md "Calculator Plus - Available Operations and Details")
  * [MDM Configuration](calculator-plus/mdm.md "Calculator Plus - MDM Configuration")
 
