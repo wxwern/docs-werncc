@@ -1,4 +1,7 @@
-[![](_media/icon.png ':size=20')Clarity](/clarity/ "Clarity Documentation")
+[Clarity](/clarity/ "Clarity Documentation")
+
+* [Getting Started](/clarity/getting-started.md "Clarity - Getting Started")
+* [Configuration](/clarity/configuration.md "Clarity - Configuration")
 
 ---
 
