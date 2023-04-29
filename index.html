@@ -13,6 +13,7 @@
 
     <!-- Custom Styles -->
     <style>
+      /* settings */
       :root {
         --theme-hue: 320;
         --theme-saturation: 70%;
@@ -21,12 +22,27 @@
         --base-font-weight: 500;
 
         --content-max-width: 100em;
+        --content-max-width: min(max(90vw, 55em), 110em);
+        --sidebar-toggle-width: 40px;
+        --sidebar-toggle-height: 44px;
       }
       @media (prefers-color-scheme: dark) {
         :root {
           --theme-saturation: 90%;
           --theme-lightness: 70%;
         }
+      }
+
+      /* theme overrides */
+      .sidebar {
+        height: 100%; /* original: 100vh, prevents iOS Safari from overflowing content behind tab bar
+                         as in Safari 100vh is the window height including overflow */
+      }
+      .sidebar, .sidebar-toggle, .sidebar+.content {
+        transition-timing-function: ease-in-out; /* original: ease-out */
+      }
+      .markdown-section {
+        padding: 2rem 50px; /* original: 2rem 45px, compensates --sidebar-toggle-width */
       }
     </style>
   </head>
@@ -54,10 +70,10 @@
         search: {
           maxAge: 1 * 60 * 60 * 1000, // expiration time in ms
           paths: 'auto',
-          placeholder: 'Type to search',
+          placeholder: 'Type to search...',
           noData: 'No Results!',
           depth: 6,
-          hideOtherSidebarContent: false, // whether or not to hide other sidebar content
+          hideOtherSidebarContent: false,
         },
       };
     </script>
