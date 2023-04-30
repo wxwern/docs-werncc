@@ -15,7 +15,7 @@
     <style>
       /* settings */
       :root {
-        --theme-hue: 320;
+        --theme-hue: 330;
         --theme-saturation: 70%;
         --theme-lightness: 40%;
 
@@ -23,11 +23,32 @@
         --content-max-width: min(max(90vw, 55em), 110em);
         --sidebar-toggle-width: 40px;
         --sidebar-toggle-height: 44px;
+
+        --link-color: hsl(var(--theme-hue), var(--theme-saturation), var(--theme-lightness));
+        --link-color--hover: hsl(var(--theme-hue), var(--theme-saturation), calc(var(--theme-lightness) - 10%));
+
+        /*
+        --link-color: #0080f0ff;
+        --link-text-decoration-color: #0080f030;
+        --link-color--hover: #0060d0ff;
+        --link-text-decoration-color--hover: #0060d0ff;
+        */
       }
       @media (prefers-color-scheme: dark) {
         :root {
+
           --theme-saturation: 90%;
           --theme-lightness: 70%;
+
+          --link-color: hsl(var(--theme-hue), var(--theme-saturation), var(--theme-lightness));
+          --link-color--hover: hsl(var(--theme-hue), var(--theme-saturation), calc(var(--theme-lightness) + 10%));
+
+          /*
+          --link-color: #1aaaffff;
+          --link-text-decoration-color: #1aaaff60;
+          --link-color--hover: #1acaffff;
+          --link-text-decoration-color--hover: #1acaffff;
+          */
         }
       }
 
@@ -41,6 +62,9 @@
       }
       .markdown-section {
         padding: 2rem 50px; /* original: 2rem 45px, compensates --sidebar-toggle-width */
+      }
+      a strong {
+        color: unset;
       }
     </style>
   </head>

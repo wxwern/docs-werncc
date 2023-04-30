@@ -69,6 +69,8 @@ While editing entry text, the app **automatically saves** as soon as you pause t
 
 Plus, the app **syncs across all your devices** via iCloud Drive. Thus, if you're signed in to the same Apple ID on all your Apple devices, you can create, view and edit them on all devices and Personal Diary will stay up-to-date.
 
+On iOS 13+, iPadOS 13+, macOS 10.15+ and watchOS 6+ (the versions officially still supported by Personal Diary), you can find advanced actions by tapping and holding, Haptic Touch, 3D Touch, or control-clicking the item. For instance, tap and hold an entry in the Timeline to see a preview or delete it.
+
 ## Customization
 
 Don't like the defaults? Many customization options are available in the app's settings. For example:

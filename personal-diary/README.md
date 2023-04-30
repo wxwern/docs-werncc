@@ -11,3 +11,5 @@
 </div>
 
 > Check out the side menu for tutorials, feature details and more!
+
+Just getting started? Try checking out [the basics](/personal-diary/the-basics).

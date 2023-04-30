@@ -8,6 +8,6 @@ Welcome! Find **tutorials**, **documentations** and **advanced information** on 
 
 ---
 
-© [wern.cc](https://wern.cc)
+© <a style="color: var(--base-color) !important;" href="https://wern.cc/" target="_blank">wern.cc</a>
 
-<span style="font-size: 70%">_Powered by [docsify](https://github.com/docsifyjs/docsify) + [docsify-themeable](https://github.com/jhildenbiddle/docsify-themeable)_</span>
+<small>_Powered by [docsify](https://github.com/docsifyjs/docsify) + [docsify-themeable](https://github.com/jhildenbiddle/docsify-themeable)_</small>
