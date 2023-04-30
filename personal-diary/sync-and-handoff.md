@@ -17,8 +17,8 @@ iCloud sync is enabled by default if you already use an Apple ID for all your de
 Furthermore, for sync to happen as soon as possible, you must:
 1. be **connected to the Internet**,
 2. have **not blocked Internet access** for <u>both</u> Personal Diary and iCloud Drive (such as in Cellular Data settings),
-3. have **Low Data Mode is turned off**,
-4. have **Low Power Mode is turned off**,
+3. have **Low Data Mode turned off**,
+4. have **Low Power Mode turned off**,
 5. have **adequate space available** in <u>both</u> iCloud and your local storage.
 
 Once that's done, the app will sync data to iCloud Drive on a best effort basis. If the app does not update new data immediately, in which case a simple refresh of the Timeline in both the origin device and target device would suffice to request the app to immediately update data.
