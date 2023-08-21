@@ -10,7 +10,7 @@ To set up, change, or reset your passcode (password), simply navigating to **Bio
 
 ![Biometrics and Passcode Settings Page]()
 
-Note that the Personal Diary for watchOS does not support App Lock.
+Note that Personal Diary for watchOS does not support App Lock.
 
 If you forgot your passcode, you can attempt to reset it under **Recovery Mode** (accessible under app settings, or the passcode panel when locked).
 

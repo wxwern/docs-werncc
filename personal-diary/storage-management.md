@@ -38,7 +38,7 @@ When you next open the app, the app's active location has changed, and will rest
 
 ![Journal Picker Multi Storage Location Screenshot]()
 
-Selecting journals in your active storage location (if you have any) opens it as per usual, but you cannot open inactive journals. Doing the latter will prompt you to either migrate or chanage storage locations.
+Selecting journals in your active storage location (if you have any) opens it as per usual, but you cannot open inactive journals. Doing the latter will prompt you to either migrate or automatically chanage storage locations.
 
 ![Journal Picker Inactive Journal Screenshot]()
 
