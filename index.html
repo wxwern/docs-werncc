@@ -15,9 +15,13 @@
     <style>
       /* settings */
       :root {
-        --theme-hue: 330;
-        --theme-saturation: 70%;
-        --theme-lightness: 40%;
+        /* approx oklch(56% 0.26 335) */
+        --theme-hue: 307;
+        --theme-saturation: 100%;
+        --theme-lightness: 38%;
+
+        --mono-hue: 307;
+        --mono-saturation: 0%;
 
         --content-max-width: 100em;
         --content-max-width: min(max(90vw, 55em), 110em);
@@ -27,28 +31,20 @@
         --link-color: hsl(var(--theme-hue), var(--theme-saturation), var(--theme-lightness));
         --link-color--hover: hsl(var(--theme-hue), var(--theme-saturation), calc(var(--theme-lightness) - 10%));
 
-        /*
-        --link-color: #0080f0ff;
-        --link-text-decoration-color: #0080f030;
-        --link-color--hover: #0060d0ff;
-        --link-text-decoration-color--hover: #0060d0ff;
-        */
+        --selection-color: hsla(var(--theme-hue), var(--theme-saturation), var(--theme-lightness), 0.25);
       }
       @media (prefers-color-scheme: dark) {
         :root {
+          /* approx oklch(70% 0.23 335) */
+          --theme-hue: 310;
+          --theme-saturation: 83%;
+          --theme-lightness: 64%;
 
-          --theme-saturation: 90%;
-          --theme-lightness: 70%;
+          --mono-hue: 310;
+          --mono-saturation: 0%;
 
           --link-color: hsl(var(--theme-hue), var(--theme-saturation), var(--theme-lightness));
           --link-color--hover: hsl(var(--theme-hue), var(--theme-saturation), calc(var(--theme-lightness) + 10%));
-
-          /*
-          --link-color: #1aaaffff;
-          --link-text-decoration-color: #1aaaff60;
-          --link-color--hover: #1acaffff;
-          --link-text-decoration-color--hover: #1acaffff;
-          */
         }
       }
 
