@@ -9,7 +9,9 @@ Personal Diary automatically synchronizes all your data across all your Apple de
 iCloud sync is enabled by default if you already use an Apple ID for all your devices. Nevertheless, these are the minimal requirements for iCloud Sync to function for Personal Diary:
 
 1. You must be **signed in to the same Apple ID** on all your devices. Your Apple ID is the account listed at the top in System Settings.
+
 2. In _System Settings_ &rarr; \[Your Name\] &rarr; iCloud &rarr; Apps Using iCloud, **iCloud Drive is enabled** and **Personal Diary is turned on**.
+
 4. In _Personal Diary_ &rarr; Settings &rarr; Storage Location &amp; Usage, **iCloud Drive is selected as the storage location**.
 
 ?> **Note:** If you have been storing data in Local Storage for a while and need to switch to iCloud Drive, you might need to [migrate data between storage locations](/personal-diary/storage-management?id=migrating-data-between-storage-locations).

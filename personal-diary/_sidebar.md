@@ -5,6 +5,9 @@
  * [Frequently Asked Questions](/personal-diary/faq.md "Personal Diary - Frequently Asked Questions")
 
 **Features**
+ * [Timeline View](/personal-diary/timeline.md "Personal Diary - Timeline View")
+ * [Entry Page](/personal-diary/entry-page.md "Personal Diary - Entry Page")
+ * [Calendar View](/personal-diary/calendar-view.md "Personal Diary - Calendar View")
  * [iCloud Sync](/personal-diary/sync-and-handoff.md "Personal Diary - iCloud Sync")
  * [App Lock](/personal-diary/app-lock.md "Personal Diary - App Lock")
  * [UI Customization](/personal-diary/ui-customization.md "Personal Diary - UI Customization")
@@ -19,6 +22,7 @@
 
 **Miscellaneous**
  * [Changelog](/personal-diary/changelog.md "Personal Diary - Changelog")
+ * [Beta Releases](/personal-diary/beta-releases.md "Personal Diary - Beta Releases")
  * [Raw Data Archive Format](/personal-diary/export-data-format.md "Personal Diary - Raw Data Archive Format")
 
 ---
